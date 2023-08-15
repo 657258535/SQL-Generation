@@ -8,12 +8,13 @@
 			* {
 				margin: 0;
 				padding: 0;
+				border: 0px;
 				box-sizing: border-box;
 			}
 			body{background-color: #333;}
 			#sqldata {
-				width: 95%;
-				margin-left: 2.5%;
+				width: 95vw;
+				margin-left: 2.5vw;
 				height: 70vh;
 				margin-top: 5vh;
 				resize: none;
@@ -45,8 +46,11 @@
 				background-color: #555;
 			}
 			#tip{
-				width: 100%;
-				border: 0px;
+				width: 95.5vw;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin: 0 auto;
 			}
 			#tip input{
 				width: 8vw;
@@ -64,7 +68,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="tip" style="width: 100%;text-align: center;">
+		<div id="tip">
 			<input type="button" onclick="addtype(this.value)" value="int(10)"/>
 			<input type="button" onclick="addtype(this.value)" value="float"/>
 			<input type="button" onclick="addtype(this.value)" value="double"/>
