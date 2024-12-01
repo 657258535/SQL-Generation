@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SQL Generation</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				border: 0px;
+				box-sizing: border-box;
+			}
+			body{background-color: #333;}
+			#sqldata {
+				width: 95vw;
+				margin-left: 2.5vw;
+				height: 70vh;
+				margin-top: 5vh;
+				resize: none;
+				border: 5px solid #555;
+				padding: 10px;
+				outline: none;
+				background-color: #333;
+				color: seagreen;
+				font-size: 16px;
+			}
+			.btn{
+				width: 12.5rem;
+				height: 5vh;
+				background-color: #333;
+				color: seagreen;
+				border: 5px solid #555;
+				font-weight: 800;
+				font-size: 12px;
+				margin: 5vh 18px 0px 18px;
+				display: inline-block;
+				vertical-align:middle;
+			}
+			.btn input,.btn span{
+				display: inline-block;
+				vertical-align:middle;
+				margin-top: 1vh;
+			}
+			.btn:hover{
+				background-color: #555;
+			}
+			#tip{
+				width: 95.5vw;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin: 0 auto;
+			}
+			#tip input{
+				width: 8vw;
+				height: 5vh;
+				margin: 5vh 8px 0px 8px;
+				background-color: #333;
+				color: seagreen;
+				border: 5px solid #555;
+				font-weight: 800;
+				font-size: 12px;
+			}
+			#tip input:hover{
+				background-color: #555;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="tip">
+			<input type="button" onclick="addtype(this.value)" value="int(10)"/>
+			<input type="button" onclick="addtype(this.value)" value="float"/>
+			<input type="button" onclick="addtype(this.value)" value="double"/>
+			<input type="button" onclick="addtype(this.value)" value="text"/>
+			<input type="button" onclick="addtype(this.value)" value="longtext"/>
+			<input type="button" onclick="addtype(this.value)" value="varchar(255)"/>
+			<input type="button" onclick="addtype(this.value)" value="date"/>
+			<input type="button" onclick="addtype(this.value)" value="datetime"/>
+			<input type="button" onclick="addtype(this.value)" value="timestamp"/>
+			<input type="button" onclick="addtype(this.value)" value="boolean"/>
+		</div>
+		<textarea id="sqldata" spellcheck="false"></textarea>
+		<div style="width: 100%;text-align: center;">
+			<button class="btn" id="btn">Generate MySql</button>
+			<button class="btn" onclick="downsql()">Download Sql</button>
+			<button class="btn" onclick="textCopy()">Copy SQL</button>
+			<div class="btn" style="display:none;"><input type="checkbox" onclick="fy(this)" value="翻译" /><span>&nbsp;&nbsp;翻译字段</span></div>
+		</div>
+<script type="text/html" id="demo">orders-OrderName
+orderID-int(10)
+user-varchar(255)
+ctime-datetime
+ftime-datetime
+IP-varchar(128)
+rmb-int(10)
+status-varchar(5)
+</script>
+<script type="text/html" id="TableDatas">
+CREATE TABLE IF NOT EXISTS `[TableName]` (
+`id` int NOT NULL,
+[TableData]
+);
+
+ALTER TABLE `[TableName]`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `[TableName]`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+COMMIT;
+</script>
+		<script type="text/javascript">
+			var fys=false;
+			function fy(e){
+				if(e.checked == true){
+					fys=true;
+				}else{
+					fys=false;
+				}
+			}
+			document.getElementById("sqldata").value=document.getElementById("demo").innerHTML
+			document.getElementById("btn").addEventListener("click",function(){
+				var code=" COLLATE utf8mb4_unicode_ci";//设置编码
+				var notnull=" NOT NULL";//设置不为空
+				var defaultnull=" DEFAULT NULL";//设置默认为空
+				var data = document.getElementById("sqldata").value;
+				var TableData="";
+				data=data.split("\n").filter(Boolean);//分割并过滤空数组
+				var tablename="";
+				var tablecname="";
+				for(var i=0; i<data.length; i++){
+					var str = data[i].split("-");
+					// 如果翻译在这处理最合适
+				// 	if(fys==true){
+				// 		str['0']=$.ajax({type:'GET',async: false,url:"?str="+str['0']}).responseText;
+				// 		str['0']=str['0'].split(" ").join("");
+				// 		str['0']=str['0'].split("\n").join("");
+				// 	}
+					if(i==0){
+						tablename=str['0'];
+						tablecname=str['1'];
+					}else{
+						if(str['1']=="varchar(255)" || str['1']=="text" || str['1']=="longtext"){
+							TableData += "`" + str['0'] + "` " + str['1'] + code + defaultnull + ",\n";
+						}else{
+							TableData += "`" + str['0'] + "` " + str['1'] + defaultnull + ",\n";
+						}
+					}
+					
+				}
+				TableData=TableData.slice(0,-2);
+				data=document.getElementById("TableDatas").innerHTML;
+				data=data.split("[TableData]").join(TableData);
+				data=data.split("[TableName]").join(tablename);
+				data=data.split("[TableCname]").join(tablecname);
+				document.getElementById("sqldata").value=data;
+				alert("If the SQL build succeeds, do not build it more than once, resulting in an error");
+			});
+			function addtype(str){
+				selectStartContext("sqldata",str);
+			}
+			function selectStartContext(id,text){
+			        //获取dom
+			        var elInput = document.getElementById(id);
+			        //光标开始的下标
+			        var startPos = elInput.selectionStart;
+			        //光标结束的下标
+			        var endPos = elInput.selectionEnd;
+			        if (startPos === undefined || endPos === undefined) return
+			        //获取dom中的值
+			        var txt = elInput.value;
+			        //光标开始跟结束之间内容替换
+			        var result = txt.substring(0, startPos) +text + txt.substring(endPos)
+			        elInput.value = result;
+			        elInput.focus();
+			        //设置光标的位置设为添加内容后的位置
+			        elInput.selectionStart = startPos + text.length;
+			        elInput.selectionEnd = startPos + text.length;
+			      }
+			function download_file(filename, text) {
+			  var pom = document.createElement('a');
+			  pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+			  pom.setAttribute('download', filename);
+			  if (document.createEvent) {
+				  var event = document.createEvent('MouseEvents');
+				  event.initEvent('click', true, true);
+				  pom.dispatchEvent(event);
+			  } else {
+				  pom.click();
+			  }
+			}
+			function downsql(){
+				var data = document.getElementById("sqldata").value;
+				if(data.indexOf("ALTER TABLE") == -1){
+					document.getElementById("btn").click();
+					data = document.getElementById("sqldata").value;
+				}
+				download_file("mysql.sql", data);
+			}
+			function textCopy() {
+				var data = document.getElementById('sqldata').value;
+				if(data.indexOf("ALTER TABLE") == -1){
+					document.getElementById("btn").click();
+				}
+				data = document.getElementById('sqldata');
+				data.select();
+				document.execCommand('copy');
+				}
+			
+		</script>
+
+	</body>
+</html>
