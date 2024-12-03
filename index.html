@@ -205,7 +205,9 @@ function viewSQL(){
 	// 从缓存中获取生成的SQL语句
 	const sql = localStorage.getItem('generatedSQL');
 	var fieldsInput = document.getElementById('fields');
-	fieldsInput.value=sql;
+	if(sql){
+		fieldsInput.value=sql;
+	}
 }
 //清空sql
 function clearSQL(){
