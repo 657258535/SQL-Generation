@@ -84,6 +84,8 @@
 		<div style="width: 100%;text-align: center;">
 			<button class="btn" onclick="generateAndSaveSQL()">Generate MySql</button>
 			<button class="btn" onclick="downloadSQL()">Download Sql</button>
+			<button class="btn" onclick="viewSQL()">View SQL</button>
+			<button class="btn" onclick="clearSQL()">Clear Sql</button>
 		</div>
 <script type="text/javascript">
 var tem = "orderid-int(10)-订单ID\nuserid-int(10)-用户ID\ncreationtime-datetime-创建时间\npaymenttime-datetime-付款时间\namount-double-订单金额\nstatus-varchar(5)-付款状态"
@@ -196,6 +198,18 @@ function downloadSQL() {
 
   // 释放URL对象
   URL.revokeObjectURL(downloadLink.href);
+}
+
+//查看sql
+function viewSQL(){
+	// 从缓存中获取生成的SQL语句
+	const sql = localStorage.getItem('generatedSQL');
+	var fieldsInput = document.getElementById('fields');
+	fieldsInput.value=sql;
+}
+//清空sql
+function clearSQL(){
+	localStorage.removeItem('generatedSQL');
 }
 </script>
 	</body>
